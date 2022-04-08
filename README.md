@@ -1,2 +1,2 @@
 # Ohsori-ML
-Ohsori-ML
+Osori-ML
