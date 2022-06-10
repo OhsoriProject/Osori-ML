@@ -1,12 +1,7 @@
 from flask import Flask, request, jsonify
 import re
-from konlpy.tag import Kkma
-from konlpy.tag import Okt
 
 app = Flask(__name__)
-
-kkma = Kkma()
-okt = Okt()
 
 # 감성 사전
 emotional_feature = {
@@ -55,15 +50,21 @@ def get_feature_keywords(feature, chat):
     return key
 
 
+def temporary_song_list():
+    songs = ["24KGolden Mood audio", "IU 금요일에 만나요 audio", "IU 금요일에 만나요 audio"]
+    return songs
+
+
 # 컨트롤러
 @app.route('/chat', methods=['POST'])
 def chat():
     param = request.get_json()
-    text = param['chat']
+    text = param['content']
     res = preprocessing(text)
     keywords = get_feature_keywords(genre_feature, res)
     print('키워드 : ', keywords)
-    return jsonify({'keywords': keywords})
+    play_list = temporary_song_list()
+    return jsonify({'playlist': play_list})
 
 
 app.run(host='127.0.0.1', port=5000)
