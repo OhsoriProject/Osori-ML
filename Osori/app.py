@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 import re
+from selenium import webdriver
+import random
 
 app = Flask(__name__)
 
@@ -29,7 +31,8 @@ genre = [
     '재즈', '블루스', '컨트리', '포크', '일렉트로니카', '하우스', '클럽음악', '모던록', '하드록', '랩',
     '하드코어랩', '갱스터', '소울', '국악', '국악크로스오버', '연주곡', '연주', '국내영화', '뮤지컬', '국내드라마', '보사노바',
     '라틴재즈', '오페라', '크로스오버', '현대음악', '성악', '합창곡', '샹송', '레게', '탱고', '플라멩코',
-    '브라질', '브라질리언', '동요', '만화', '자장가', '판소리', '풍물', '사물놀이', '민요', '아이돌', '남돌', '여돌', '캐롤', '캐럴','피아노', '재즈피아노', '지브리', '애니',
+    '브라질', '브라질리언', '동요', '만화', '자장가', '판소리', '풍물', '사물놀이', '민요', '아이돌', '남돌', '여돌', '캐롤', '캐럴', '피아노', '재즈피아노', '지브리',
+    '애니',
     'bgm'
 ]
 
@@ -75,9 +78,31 @@ def get_feature_keywords(feature, chat):
     return key
 
 
-def temporary_song_list():
-    songs = ["24KGolden Mood audio", "IU 금요일에 만나요 audio", "IU 금요일에 만나요 audio"]
-    return songs
+# 노래 추출
+def extract_musics(key1, key2):
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument(
+        "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36")
+    driver = webdriver.Chrome('/usr/local/bin/chromedriver', options=chrome_options)
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36'}
+    url = f'https://www.melon.com/dj/djfinder/djfinder_inform.htm?djSearchType=T&djSearchKeyword=%23{key1}#params%5BdjSearchType%5D=T&params%5BdjSearchKeyword%5D=%23{key1}%2C%23{key2}&params%5BorderBy%5D=POP&params%5BpagingFlag%5D=Y&params%5BtagSearchType%5D=M&po=pageObj&startIndex=1'
+    driver.get(url)
+    playlists = driver.find_element_by_xpath('//*[@id="djPlylstList"]/div/ul').find_elements_by_tag_name('li')
+    musics = []
+    for pid in range(0, 4):
+        playlists[pid].click()
+        p_len = len(driver.find_element_by_xpath('//*[@id="frm"]/div/table/tbody').find_elements_by_tag_name('tr'))
+        lst = list(range(1, p_len + 1))
+        print(p_len)
+        rand_num = random.sample(lst, 2)
+        for mid in rand_num:
+            title = driver.find_element_by_xpath(
+                f'//*[@id="frm"]/div/table/tbody/tr[{mid}]/td[5]/div/div/div[1]/span/a').text
+            singer = driver.find_element_by_xpath(
+                f'//*[@id="frm"]/div/table/tbody/tr[{mid}]/td[5]/div/div/div[2]/a').text
+            musics.append(singer + ' ' + title + ' ' + "audio")
+        driver.back()
+    return musics
 
 
 # 컨트롤러
@@ -90,7 +115,7 @@ def chat():
     for feature in features:
         keywords.extend(get_feature_keywords(feature, res))
     print('키워드 : ', keywords)
-    play_list = temporary_song_list()
+    play_list = extract_musics(keywords[0], keywords[1])
     return jsonify({'playlist': play_list})
 
 

@@ -28,6 +28,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/Users/minseokkim/Osori-ML/Osori",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)"
@@ -67,7 +68,9 @@
       <updated>1654603926457</updated>
       <workItem from="1654603929911" duration="2072000" />
       <workItem from="1654826620360" duration="5505000" />
-      <workItem from="1654936020405" duration="373000" />
+      <workItem from="1654936020405" duration="539000" />
+      <workItem from="1654940967494" duration="38000" />
+      <workItem from="1655429542876" duration="1493000" />
     </task>
     <servers />
   </component>
