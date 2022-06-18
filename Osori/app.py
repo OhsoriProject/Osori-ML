@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import re
 from selenium import webdriver
 import random
+from model_executer import get_simillar_tags
 
 app = Flask(__name__)
 
@@ -45,8 +46,7 @@ situation = [
     '초가을', '초겨울', '환절기', '집콕', '작업', '일', '외출', '편집샵', '새벽감성', '비오는날', '비', '장마', '커피', '기차'
 ]
 
-features = [emotion, description, genre, situation]
-
+features = [[emotion, "emotion"], [description, "description"], [genre, "genre"], [situation, "situation"]]
 
 # 문장 전처리
 def preprocessing(ch):
@@ -79,22 +79,24 @@ def get_feature_keywords(feature, chat):
 
 
 # 노래 추출
-def extract_musics(key1, key2):
+def extract_musics(keys):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36")
     driver = webdriver.Chrome('/usr/local/bin/chromedriver', options=chrome_options)
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36'}
-    url = f'https://www.melon.com/dj/djfinder/djfinder_inform.htm?djSearchType=T&djSearchKeyword=%23{key1}#params%5BdjSearchType%5D=T&params%5BdjSearchKeyword%5D=%23{key1}%2C%23{key2}&params%5BorderBy%5D=POP&params%5BpagingFlag%5D=Y&params%5BtagSearchType%5D=M&po=pageObj&startIndex=1'
+    if len(keys) == 1:
+        url = f'https://www.melon.com/dj/djfinder/djfinder_inform.htm?djSearchType=T&djSearchKeyword=%23{keys[0]}'
+    else:
+        url = f'https://www.melon.com/dj/djfinder/djfinder_inform.htm?djSearchType=T&djSearchKeyword=%23{keys[0]}#params%5BdjSearchType%5D=T&params%5BdjSearchKeyword%5D=%23{keys[0]}%2C%23{keys[1]}&params%5BorderBy%5D=POP&params%5BpagingFlag%5D=Y&params%5BtagSearchType%5D=M&po=pageObj&startIndex=1'
     driver.get(url)
     playlists = driver.find_element_by_xpath('//*[@id="djPlylstList"]/div/ul').find_elements_by_tag_name('li')
     musics = []
-    for pid in range(0, 4):
+    for pid in range(0, min([len(playlists), 4])):
         playlists[pid].click()
         p_len = len(driver.find_element_by_xpath('//*[@id="frm"]/div/table/tbody').find_elements_by_tag_name('tr'))
         lst = list(range(1, p_len + 1))
-        print(p_len)
-        rand_num = random.sample(lst, 2)
+        cnt = max([int(8 / len(playlists)), 2])
+        rand_num = random.sample(lst, cnt)
         for mid in rand_num:
             title = driver.find_element_by_xpath(
                 f'//*[@id="frm"]/div/table/tbody/tr[{mid}]/td[5]/div/div/div[1]/span/a').text
@@ -102,6 +104,7 @@ def extract_musics(key1, key2):
                 f'//*[@id="frm"]/div/table/tbody/tr[{mid}]/td[5]/div/div/div[2]/a').text
             musics.append(singer + ' ' + title + ' ' + "audio")
         driver.back()
+    print('태그 : ', keys, '\n음악 : ', musics)
     return musics
 
 
@@ -111,12 +114,59 @@ def chat():
     param = request.get_json()
     text = param['content']
     res = preprocessing(text)
-    keywords = []
+    keywords = {}
+    rand_arr = []
+    idx = 0
     for feature in features:
-        keywords.extend(get_feature_keywords(feature, res))
+        keywords[feature[1]] = get_feature_keywords(feature[0], res)
+        if idx == 2:
+            idx += 1
+            continue
+        if len(keywords[feature[1]]) != 0:
+            rand_arr.append(idx)
+        idx += 1
     print('키워드 : ', keywords)
-    play_list = extract_musics(keywords[0], keywords[1])
+    play_list = []
+
+    rand_combi = -1 if len(rand_arr) < 2 else random.sample(rand_arr,2)
+
+    all_tags = []
+    if rand_combi != -1:
+        rand_keyword1 = keywords[features[rand_combi[0]][1]]
+        rand_keyword2 = keywords[features[rand_combi[1]][1]]
+        rand_k1 = random.randint(0,len(rand_keyword1)-1)
+        rand_k2 = random.randint(0,len(rand_keyword2)-1)
+        play_list.extend(extract_musics([rand_keyword1[rand_k1],rand_keyword2[rand_k2]]))
+    for keyword in keywords.keys():
+        if len(keywords[keyword]) == 0:
+            continue
+        if keyword == 'genre':
+            if len(keywords['genre']) > 2:
+                rand_genre = random.sample(list(range(0,len(keywords['genre'])-1)),2)
+                play_list.extend(extract_musics([keywords['genre'][rand_genre[0]],keywords['genre'][rand_genre[1]]]))
+            else:
+                play_list.extend(extract_musics(keywords['genre']))
+            continue
+        if rand_combi != -1:
+            if keyword != features[rand_combi[0]][1] and keyword != features[rand_combi[1]][1]:
+                rand_key = random.randint(0,len(keywords[keyword])-1)
+                tags = get_simillar_tags(keywords[keyword][rand_key])
+                print('대상 키워드 : ', keywords[keyword][rand_key], ' / 추출 태그 : ', tags)
+                rand_k3 = random.randint(0, len(tags) - 1)
+                play_list.extend(extract_musics([keywords[keyword][rand_key],tags[rand_k3]]))
+        rand_all_key = random.randint(0, len(keywords[keyword]) - 1)
+        all_tags.extend(get_simillar_tags(keywords[keyword][rand_all_key]))
+        all_tags.append(keywords[keyword][rand_all_key])
+        print(all_tags)
+
+    if len(all_tags) != 0:
+        if len(all_tags) == 1:
+            play_list.extend(extract_musics([all_tags[0]]))
+        else:
+            rand_tags_num = random.sample(list(range(0, len(all_tags))), 2)
+            play_list.extend(extract_musics([all_tags[rand_tags_num[0]],all_tags[rand_tags_num[1]]]))
+
     return jsonify({'playlist': play_list})
 
 
-app.run(host='127.0.0.1', port=5000)
+app.run(host='127.0.0.1', port=5001)
