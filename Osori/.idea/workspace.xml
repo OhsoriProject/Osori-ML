@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3168f160-7184-41a5-ad16-ffd0b480aa61" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Osori.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Osori.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
@@ -97,7 +96,12 @@
       <workItem from="1655515165234" duration="2852000" />
       <workItem from="1655518879592" duration="249000" />
       <workItem from="1655519136929" duration="16749000" />
-      <workItem from="1655544427957" duration="64000" />
+      <workItem from="1655544427957" duration="495000" />
+      <workItem from="1655548225778" duration="306000" />
+      <workItem from="1655556904791" duration="274000" />
+      <workItem from="1655606492805" duration="126000" />
+      <workItem from="1655607173089" duration="1023000" />
+      <workItem from="1655626321981" duration="1599000" />
     </task>
     <servers />
   </component>
