@@ -101,7 +101,8 @@
       <workItem from="1655556904791" duration="274000" />
       <workItem from="1655606492805" duration="126000" />
       <workItem from="1655607173089" duration="1023000" />
-      <workItem from="1655626321981" duration="1599000" />
+      <workItem from="1655626321981" duration="4568000" />
+      <workItem from="1655686454704" duration="2481000" />
     </task>
     <servers />
   </component>
@@ -110,6 +111,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Osori$main.coverage" NAME="main 커버리지 결과" MODIFIED="1654604171377" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Osori$app.coverage" NAME="app 커버리지 결과" MODIFIED="1655431044381" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Osori$app.coverage" NAME="app 커버리지 결과" MODIFIED="1655643577958" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

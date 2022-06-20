@@ -111,6 +111,7 @@ def extract_musics(keys):
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36")
     driver = webdriver.Chrome('/usr/local/bin/chromedriver', options=chrome_options)
+
     if len(keys) == 1:
         url = f'https://www.melon.com/dj/djfinder/djfinder_inform.htm?djSearchType=T&djSearchKeyword=%23{keys[0]}'
     else:
